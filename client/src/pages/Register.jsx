@@ -21,11 +21,13 @@ const Register = () => {
       body: JSON.stringify(register),
       headers: { "Content-Type": "application/json" },
     });
+    console.log(response);
     if (response.ok === false) {
       alert("Failed to register || username is already available");
     } else {
       alert("Successfully registered");
     }
+    setRegister(intialvalue);
   };
 
   return (

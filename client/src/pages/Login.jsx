@@ -1,6 +1,9 @@
 import React, { useState } from "react";
+import { Navigate } from "react-router-dom";
 
 const Login = () => {
+  const [redirect, setRedirect] = useState(false);
+
   const intialvalue = {
     username: "",
     password: "",
@@ -12,7 +15,7 @@ const Login = () => {
       return { ...prev, [name]: value };
     });
   };
-  console.log(login);
+  // console.log(login);
 
   const handlesubmit = async (e) => {
     e.preventDefault();
@@ -20,14 +23,23 @@ const Login = () => {
       method: "POST",
       body: JSON.stringify(login),
       headers: { "Content-Type": "application/json" },
+      credentials: "include",
     });
-    console.log(response);
-    // if (response.ok === false) {
-    //   alert("Failed to register || username is already available");
-    // } else {
-    //   alert("Successfully registered");
-    // }
+    setlogin(intialvalue);
+    // console.log(response);
+    const data = await response.json();
+    console.log(data);
+    if (data === "ok") {
+      alert("Login successful");
+      setRedirect(true);
+    } else if (data.msg === "wrong password") {
+      alert("Invalid password");
+    }
   };
+
+  if (redirect) {
+    return <Navigate to="/" replace={true} />;
+  }
 
   return (
     <form className="login" onSubmit={handlesubmit}>
