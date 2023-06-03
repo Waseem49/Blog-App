@@ -5,6 +5,7 @@ import Post from "./components/Post";
 import Register from "./pages/Register";
 import Login from "./pages/Login";
 import Homepage from "./pages/Homepage";
+import CreatePost from "./pages/CreatePost";
 
 function App() {
   return (
@@ -14,6 +15,7 @@ function App() {
         <Route path="/" element={<Homepage />} />
         <Route path="/register" element={<Register />} />
         <Route path="/login" element={<Login />} />
+        <Route path="/create" element={<CreatePost />} />
       </Routes>
     </main>
   );

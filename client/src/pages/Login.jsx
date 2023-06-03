@@ -1,8 +1,10 @@
-import React, { useState } from "react";
+import React, { useContext, useState } from "react";
 import { Navigate } from "react-router-dom";
+import { userContext } from "../context/usercontext";
 
 const Login = () => {
   const [redirect, setRedirect] = useState(false);
+  const { userinfo, setuserinfo } = useContext(userContext);
 
   const intialvalue = {
     username: "",
@@ -26,14 +28,18 @@ const Login = () => {
       credentials: "include",
     });
     setlogin(intialvalue);
-    // console.log(response);
+    console.log(response);
     const data = await response.json();
     console.log(data);
-    if (data === "ok") {
+
+    if (data.username) {
       alert("Login successful");
+      setuserinfo(data);
       setRedirect(true);
     } else if (data.msg === "wrong password") {
       alert("Invalid password");
+    } else if (data.msg === "user not found") {
+      alert("register first");
     }
   };
 

@@ -1,10 +1,17 @@
 const express = require("express");
 const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
+const multer = require("multer");
+const uploadmiddleware = multer({ dest: "uploads/" });
+const fs = require("fs");
 const secretkey = "kuyfk654jhfb";
 const { userModel } = require("../models/user.model");
+const { postModel } = require("../models/post.model");
+const path = require("path");
 const userRouter = express.Router();
+console.log(express.static(__dirname + "../uploads"));
 
+userRouter.use("/uploads", express.static("uploads"));
 const salt = bcrypt.genSaltSync(5);
 
 userRouter.post("/register", async function (req, res) {
@@ -21,7 +28,6 @@ userRouter.post("/register", async function (req, res) {
   }
 });
 
-userRouter.post("/login", async (req, res) => {
   const { username, password } = req.body;
   try {
     const user = await userModel.findOne({ username });
@@ -32,7 +38,7 @@ userRouter.post("/login", async (req, res) => {
         jwt.sign({ username, id: user._id }, secretkey, {}, (err, token) => {
           if (err) throw err;
           // res.status(200).json({ msg: "Login Success", token: token });
-          res.cookie("token", token).json("ok");
+          res.cookie("token", token).json({ id: user._id, username });
         });
       } else {
         res.status(200).json({ msg: "wrong password" });
@@ -43,6 +49,46 @@ userRouter.post("/login", async (req, res) => {
   } catch (error) {
     res.status(400).json({ error: error.message });
   }
+});
+
+userRouter.get("/profile", (req, res) => {
+  const { token } = req.cookies;
+  jwt.verify(token, secretkey, {}, (err, info) => {
+    if (err) throw err;
+    res.json(info);
+  });
+  res.json(req.cookies);
+});
+
+userRouter.post("/logout", (req, res) => {
+  res.cookie("token", "").json("ok");
+});
+
+userRouter.post("/post", uploadmiddleware.single("file"), async (req, res) => {
+  const { originalname, path } = req.file;
+  const parts = originalname.split(".");
+  const ext = parts[parts.length - 1];
+  const newpath = path + "." + ext;
+  fs.renameSync(path, newpath);
+
+  const { token } = req.cookies;
+  jwt.verify(token, secretkey, {}, async (err, info) => {
+    console.log(info);
+    if (err) throw err;
+    const { title, summary, content } = req.body;
+    const postdoc = await postModel.create({
+      title,
+      summary,
+      content,
+      cover: newpath,
+      author: info.username,
+    });
+    res.json(postdoc);
+  });
+});
+
+userRouter.get("/post", async (req, res) => {
+  res.json(await postModel.find().sort({ createdAt: -1 }).limit(20));
 });
 
 module.exports = {

@@ -80,10 +80,11 @@ button {
   color: #fff;
   border-radius: 5px;
   padding: 7px 0;
+  margin-top: 5px;
 }
 button:hover {
   background-color: #292828;
 }
-form h1 {
+form.login h1 form.register h1 {
   text-align: center;
 }
