@@ -6,6 +6,7 @@ body {
 }
 a {
   text-decoration: none;
+  color: inherit;
 }
 img {
   max-width: 100%;
@@ -36,13 +37,19 @@ header nav {
 }
 .post {
   display: grid;
-  grid-template-columns: 0.9fr 1.1fr;
+  grid-template-columns: 1fr;
   gap: 1rem;
   margin-bottom: 2rem;
+}
+@media screen and (min-width: 550px) {
+  .post {
+    grid-template-columns: 0.9fr 1.1fr;
+  }
 }
 .post .texts h2 {
   margin: 0;
   font-size: 1.5rem;
+  color: inherit;
 }
 .post .info {
   margin: 6px 0;
@@ -87,4 +94,50 @@ button:hover {
 }
 form.login h1 form.register h1 {
   text-align: center;
+}
+
+.singlepost .image {
+  max-height: 300px;
+
+  display: flex;
+  overflow: hidden;
+}
+.singlepost .image img {
+  width: 100%;
+  object-fit: cover;
+}
+.singlepost h1 {
+  text-align: center;
+  margin: 0%;
+}
+.singlepost p {
+  margin: 0;
+}
+.singlepost time {
+  display: block;
+  text-align: center;
+  font-size: 0.8rem;
+  color: #aaa;
+}
+.singlepost .author {
+  text-align: center;
+  margin-bottom: 1.2rem;
+  font-size: 0.8rem;
+  font-weight: bold;
+}
+.content {
+  line-height: 1.6rem;
+}
+.editdiv {
+  text-align: center;
+  margin-bottom: 1.3rem;
+}
+.edit {
+  display: inline-flex;
+  align-items: center;
+  text-align: center;
+  border-radius: 5px;
+  padding: 5px 10px;
+  color: #ddd;
+  background-color: #333;
 }

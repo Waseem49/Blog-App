@@ -9,9 +9,7 @@ const { userModel } = require("../models/user.model");
 const { postModel } = require("../models/post.model");
 const path = require("path");
 const userRouter = express.Router();
-console.log(express.static(__dirname + "../uploads"));
 
-userRouter.use("/uploads", express.static("uploads"));
 const salt = bcrypt.genSaltSync(5);
 
 userRouter.post("/register", async function (req, res) {
@@ -28,6 +26,7 @@ userRouter.post("/register", async function (req, res) {
   }
 });
 
+userRouter.post("/login", async (req, res) => {
   const { username, password } = req.body;
   try {
     const user = await userModel.findOne({ username });
@@ -89,6 +88,45 @@ userRouter.post("/post", uploadmiddleware.single("file"), async (req, res) => {
 
 userRouter.get("/post", async (req, res) => {
   res.json(await postModel.find().sort({ createdAt: -1 }).limit(20));
+});
+
+userRouter.patch("/post", uploadmiddleware.single("file"), async (req, res) => {
+  let newpath = null;
+  if (req.file) {
+    const { originalname, path } = req.file;
+    const parts = originalname.split(".");
+    const ext = parts[parts.length - 1];
+    newpath = path + "." + ext;
+    fs.renameSync(path, newpath);
+  }
+  const { token } = req.cookies;
+  jwt.verify(token, secretkey, {}, async (err, info) => {
+    console.log(info);
+    if (err) throw err;
+    const { id, title, summary, content } = req.body;
+    console.log(id);
+    const postdoc = await postModel.findById(id);
+    if (postdoc.author === info.username) {
+      const final = await postModel.findOneAndUpdate(
+        id,
+        { title, summary, content, cover: newpath ? newpath : postdoc.cover },
+        { new: true }
+      );
+      // await postdoc.update({
+      //   title,
+      //   summary,
+      //   content,
+      //   cover: newpath ? newpath : postdoc.cover,
+      // });
+    }
+    res.json(final);
+  });
+});
+
+userRouter.get("/post/:id", async (req, res) => {
+  const { id } = req.params;
+
+  res.json(await postModel.find({ _id: id }));
 });
 
 module.exports = {
