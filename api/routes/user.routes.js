@@ -90,7 +90,7 @@ userRouter.get("/post", async (req, res) => {
   res.json(await postModel.find().sort({ createdAt: -1 }).limit(20));
 });
 
-userRouter.patch("/post", uploadmiddleware.single("file"), async (req, res) => {
+userRouter.put("/post", uploadmiddleware.single("file"), async (req, res) => {
   let newpath = null;
   if (req.file) {
     const { originalname, path } = req.file;
@@ -104,22 +104,27 @@ userRouter.patch("/post", uploadmiddleware.single("file"), async (req, res) => {
     console.log(info);
     if (err) throw err;
     const { id, title, summary, content } = req.body;
-    console.log(id);
-    const postdoc = await postModel.findById(id);
-    if (postdoc.author === info.username) {
-      const final = await postModel.findOneAndUpdate(
-        id,
-        { title, summary, content, cover: newpath ? newpath : postdoc.cover },
-        { new: true }
-      );
-      // await postdoc.update({
-      //   title,
-      //   summary,
-      //   content,
-      //   cover: newpath ? newpath : postdoc.cover,
-      // });
-    }
-    res.json(final);
+    console.log(id, title, summary, content);
+    // const postdoc = await postModel.findById(id);
+    // if (postdoc.author === info.username) {
+    //   const final = await postModel.findOneAndUpdate(
+    //     id,
+    //     { title, summary, content, cover: newpath ? newpath : postdoc.cover },
+    //     { new: true }
+    //   );
+    // await postdoc.update({
+    //   title,
+    //   summary,
+    //   content,
+    //   cover: newpath ? newpath : postdoc.cover,
+    // });
+    // }
+    // res.json(final);
+    const updated = await postModel.findByIdAndUpdate(
+      { _id: id },
+      { title: title, summary: summary, content: content, cover: newpath }
+    );
+    res.json(updated);
   });
 });
 
