@@ -62,7 +62,7 @@ const Editpost = () => {
     }
     e.preventDefault();
     const response = await fetch("http://localhost:5000/users/post", {
-      method: "PUT",
+      method: "PATCH",
       body: data,
       credentials: "include",
     });

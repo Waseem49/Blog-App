@@ -1,4 +1,6 @@
 import React, { useState } from "react";
+import axios from "axios";
+import { useNavigate } from "react-router-dom";
 
 const Register = () => {
   const intialvalue = {
@@ -6,6 +8,7 @@ const Register = () => {
     password: "",
   };
   const [register, setRegister] = useState(intialvalue);
+  const nevigated = useNavigate();
   const handlechange = (e) => {
     const { name, value } = e.target;
     setRegister((prev) => {
@@ -16,18 +19,33 @@ const Register = () => {
 
   const handlesubmit = async (e) => {
     e.preventDefault();
-    const response = await fetch("http://localhost:5000/users/register", {
-      method: "POST",
-      body: JSON.stringify(register),
-      headers: { "Content-Type": "application/json" },
-    });
-    console.log(response);
-    if (response.ok === false) {
-      alert("Failed to register || username is already available");
-    } else {
+    // const response = await fetch("http://localhost:5000/users/register", {
+    //   method: "POST",
+    //   body: JSON.stringify(register),
+    //   headers: { "Content-Type": "application/json" },
+    // });
+    // console.log(response);
+    // if (response.ok === false) {
+    //   alert("Failed to register || username is already available");
+    // } else {
+    //   alert("Successfully registered");
+    // }
+    try {
+      const response = await axios.post(
+        "http://localhost:5000/users/register",
+        register,
+        {
+          headers: { "Content-Type": "application/json" },
+        }
+      );
       alert("Successfully registered");
+      setRegister(intialvalue);
+      console.log(response);
+    } catch (error) {
+      if (error) {
+        alert("Failed to register || Username is already available");
+      }
     }
-    setRegister(intialvalue);
   };
 
   return (
