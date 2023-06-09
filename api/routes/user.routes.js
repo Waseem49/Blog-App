@@ -90,52 +90,57 @@ userRouter.get("/post", async (req, res) => {
   res.json(await postModel.find().sort({ createdAt: -1 }).limit(20));
 });
 
-userRouter.patch("/post", uploadmiddleware.single("file"), async (req, res) => {
-  let newpath = null;
-  if (req.file) {
-    const { originalname, path } = req.file;
-    const parts = originalname.split(".");
-    const ext = parts[parts.length - 1];
-    newpath = path + "." + ext;
-    fs.renameSync(path, newpath);
-  }
-  const { token } = req.cookies;
-  jwt.verify(token, secretkey, {}, async (err, info) => {
-    console.log(info);
-    // if (err) throw err;
-    const { id, title, summary, content } = req.body;
-    // console.log(id, title, summary, content);
-    // const postdoc = await postModel.findById(id);
-    // if (postdoc.author === info.username) {
-    //   const final = await postModel.findOneAndUpdate(
-    //     id,
-    //     { title, summary, content, cover: newpath ? newpath : postdoc.cover },
-    //     { new: true }
-    //   );
-    // await postdoc.update({
-    //   title,
-    //   summary,
-    //   content,
-    //   cover: newpath ? newpath : postdoc.cover,
-    // });
-    // }
-    // res.json(final);
-    try {
-      const updated = await postModel.findByIdAndUpdate(
-        { _id: id },
-        { title: title, summary: summary, content: content, cover: newpath }
-      );
-      res.json(updated);
-    } catch (error) {
-      res.status(500).json({ error: error.message });
+userRouter.patch(
+  "/post/:id",
+  uploadmiddleware.single("file"),
+  async (req, res) => {
+    let newpath = null;
+    if (req.file) {
+      const { originalname, path } = req.file;
+      const parts = originalname.split(".");
+      const ext = parts[parts.length - 1];
+      newpath = path + "." + ext;
+      fs.renameSync(path, newpath);
     }
-    // const updated = await postModel.findByIdAndUpdate(
-    //   { _id: id },
-    //   { title: title, summary: summary, content: content, cover: newpath }
-    // );
-    // res.json(updated);
-  });
-});
+    const { token } = req.cookies;
+    jwt.verify(token, secretkey, {}, async (err, info) => {
+      // console.log(info);
+      // if (err) throw err;
+      const { id } = req.params;
+      const { title, summary, content } = req.body;
+      console.log(id, title, summary, content);
+      // const postdoc = await postModel.findById(id);
+      // if (postdoc.author === info.username) {
+      //   const final = await postModel.findOneAndUpdate(
+      //     id,
+      //     { title, summary, content, cover: newpath ? newpath : postdoc.cover },
+      //     { new: true }
+      //   );
+      // await postdoc.update({
+      //   title,
+      //   summary,
+      //   content,
+      //   cover: newpath ? newpath : postdoc.cover,
+      // });
+      // }
+      // res.json(final);
+      try {
+        const updated = await postModel.findByIdAndUpdate(
+          { _id: id },
+          { title: title, summary: summary, content: content, cover: newpath }
+        );
+        res.json(updated);
+      } catch (error) {
+        res.status(500).json({ error: error.message });
+      }
+      // const updated = await postModel.findByIdAndUpdate(
+      //   { _id: id },
+      //   { title: title, summary: summary, content: content, cover: newpath }
+      // );
+      // res.json(updated);
+    });
+  }
+);
 
 userRouter.get("/post/:id", async (req, res) => {
   const { id } = req.params;

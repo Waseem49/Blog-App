@@ -61,7 +61,7 @@ const Editpost = () => {
       data.set("file", files?.[0]);
     }
     e.preventDefault();
-    const response = await fetch("http://localhost:5000/users/post", {
+    const response = await fetch(`http://localhost:5000/users/post/${id}`, {
       method: "PATCH",
       body: data,
       credentials: "include",
