@@ -36,7 +36,7 @@ const CreatePost = () => {
   const [summary, setsummary] = useState("");
   const [content, setcontent] = useState("");
   const [files, setfiles] = useState("");
-
+// const [files, setfiles] = useState("");
   const [redirect, setredirect] = useState(false);
 
   const createnewpost = async (e) => {
